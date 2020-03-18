@@ -33,6 +33,9 @@ p_outG28 = Pin('G28', mode=Pin.OUT)
 
 p_in = Pin('P10', mode=Pin.IN, pull=Pin.PULL_UP)
 i=0
+s_rssi="nothing"
+s_snr="nothing"
+s_freq="nothing"
 #from https://docs.pycom.io/tutorials/lora/lora-mac/ and on https://www.youtube.com/watch?v=CXZCbTif1Ns
 
 # initialise LoRa in LORA mode
