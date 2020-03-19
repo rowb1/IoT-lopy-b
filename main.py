@@ -7,22 +7,23 @@ from machine import Pin
 import pycom
 
 # from https://github.com/MZachmann/oled-python-library
-from graphicslib import OledGrafx
-from graphicslib import OledDisplay
+##from graphicslib import OledGrafx
+##from graphicslib import OledDisplay
 # False for SH1103
-x = OledGrafx.OledGrafx(False)
+##x = OledGrafx.OledGrafx(False)
 #d = OledGrafx.OledDisplay(False)
-x.PrintStrings("Waking up","...","Hello","lora")
-time.sleep(1)
-x.oled.clear()
+##x.PrintStrings("Waking up","...","Hello","lora")
+##time.sleep(1)
+##x.oled.clear()
 
-time.sleep(1)
-#x.PrintStrings("100",str(200),"300","400")
 COLOUR_WHITE = 0xFFFFFF
 COLOUR_BLACK = 0x000000
 COLOUR_RED   = 0xFF0000
 COLOUR_GREEN = 0x00FF00
 COLOUR_BLUE  = 0x0000FF
+
+CMD_ON="Sophie"
+CMD_OFF="Milly"
 
 pycom.heartbeat(False)
 pycom.rgbled(COLOUR_BLACK)
@@ -54,9 +55,9 @@ print(i, "B message sent")
 
 while True:
     i=i+1
-    x.PrintStrings(str(i))
-    time.sleep(1)
-    x.oled.clear()
+    ##x.PrintStrings(str(i))
+    ##time.sleep(1)
+    ##x.oled.clear()
     # send some data
     #s.setblocking(True)
     #s.send("Hi from B")
@@ -82,18 +83,20 @@ while True:
         s_snr="snr: " + str(lora.stats()[2])
         s_freq="f: " + str(lora.stats()[9]/1000000)
         print(s_rssi, s_snr, s_freq)
-        x.PrintStrings(str(i) + " new data:",s_rssi,s_snr,s_freq)
-        if rcv_data[0]:
-            pycom.rgbled(COLOUR_GREEN)
+        ##x.PrintStrings(str(i) + " new data:",s_rssi,s_snr,s_freq)
+        if rcv_data==CMD_ON:
+            pycom.rgbled(COLOUR_BLUE)
             p_outG22.value(1)
             p_outG28.value(0)
-        else:
-            pycom.rgbled(COLOUR_BLUE)
+        elif rcv_data==CMD_OFF:
+            pycom.rgbled(COLOUR_GREEN)
             p_outG22.value(0)
             p_outG28.value(1)
+        else:
+            print("Outsider: ", rcv_data, s_rssi, s_snr, s_freq)
     else:
         print("nothing new; last ", s_rssi)
-        x.PrintStrings("   last values:",s_rssi,s_snr,s_freq)
+        ##x.PrintStrings("   last values:",s_rssi,s_snr,s_freq)
 
     # wait a random amount of time
 
