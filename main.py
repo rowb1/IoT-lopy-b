@@ -42,8 +42,12 @@ print("---")
 #p_outG16 = Pin('G16', mode=Pin.OUT)
 p_outG22 = Pin('G22', mode=Pin.OUT)
 p_outG28 = Pin('G28', mode=Pin.OUT)
+#turn off solenoids
+p_outG22.value(1)
+p_outG28.value(1)
 
-p_in = Pin('P10', mode=Pin.IN, pull=Pin.PULL_UP)
+p_inG12 = Pin('G12', mode=Pin.IN, pull=Pin.PULL_UP)
+p_inG13 = Pin('G13', mode=Pin.IN, pull=Pin.PULL_UP)
 i=0
 s_rssi="nothing"
 s_snr="nothing"
@@ -57,8 +61,7 @@ lora = LoRa(mode=LoRa.LORA, region=LoRa.AS923, sf=7)
 # create a raw LoRa socket
 s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 print ("starting up ... B")
-p_outG22.value(0)
-p_outG28.value(0)
+
 
 # send some data
 s.setblocking(True)
@@ -68,14 +71,32 @@ print(i, "B message sent")
 while True:
     i=i+1
 
+    if p_inG12.value()==0:
+        solenoid_state="GREEN"
+        print("manual set to ", solenoid_state)
+    #else:
+        #print("remain in auto G12")
+
+    if  p_inG13.value()==0:
+		solenoid_state="BLUE"
+		print("manual set to ", solenoid_state)
+    #else:
+        #print("remain in auto G13")
+
     if solenoid_state=="GREEN":
+        p_outG22.value(1)
+        p_outG28.value(0)
         pycom.rgbled(COLOUR_GREEN)
         time.sleep_ms(200)
         pycom.rgbled(COLOUR_BLACK)
     else:
+        p_outG22.value(0)
+        p_outG28.value(1)
         pycom.rgbled(COLOUR_BLUE)
         time.sleep_ms(200)
         pycom.rgbled(COLOUR_BLACK)
+
+
 
     ##x.PrintStrings(str(i))
     ##time.sleep(1)
@@ -103,7 +124,7 @@ while True:
         print(i, "type(rcv_data) ",type(rcv_data))
         try:
             rcv_data1=rcv_data.decode("utf-8")
-        except:  
+        except:
             print("decode on error")
             rcv_data1="dummy"
         print(i, "rcv_data1 ",rcv_data)
@@ -120,26 +141,14 @@ while True:
             print("rcv_data==CMD_ON", rcv_data1 )
             solenoid_state="GREEN"
             s.send(CMD_ON)
-            pycom.rgbled(COLOUR_GREEN)
-            time.sleep_ms(400)
-            pycom.rgbled(COLOUR_BLACK)
-            p_outG22.value(1)
-            p_outG28.value(0)
-
         elif rcv_data1==CMD_OFF:
             print("rcv_data==CMD_OFF", rcv_data1)
             solenoid_state="BLUE"
             s.send(CMD_OFF)
-            pycom.rgbled(COLOUR_BLUE)
-            time.sleep_ms(400)
-            pycom.rgbled(COLOUR_BLACK)
-            p_outG22.value(0)
-            p_outG28.value(1)
         else:
-            print("Outsider: ", rcv_data, s_rssi, s_snr, s_freq )
-            print(CMD_ON, CMD_OFF)
+            print("Unknown lora message received: ", rcv_data,rcv_data1, s_rssi, s_snr, s_freq )
     else:
-        print("nothing new; last ", s_rssi)
+        print(solenoid_state, " old; last rssi ", s_rssi)
         ##x.PrintStrings("   last values:",s_rssi,s_snr,s_freq)
 
     # wait a random amount of time
