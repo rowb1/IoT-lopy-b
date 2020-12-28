@@ -1,3 +1,4 @@
+#v2 RP 28Dec2020
 from network import LoRa
 import socket
 import machine
