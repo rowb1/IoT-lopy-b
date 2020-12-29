@@ -1,12 +1,21 @@
 ### RP 29 DEC 20 Gateway -- https://forum.pycom.io/topic/4110/first-contact-with-lora-no-success/7
+### RP add LEDS - try 2, minimal
 import socket
 import struct
 from network import LoRa
 import machine
 import time
 from graphicslib import OledGrafx
+import pycom
 
 x = OledGrafx.OledGrafx(False)
+COLOUR_BLACK = 0x000000
+COLOUR_RED   = 0xFF0000
+COLOUR_GREEN = 0x00FF00
+COLOUR_BLUE  = 0x0000FF
+pycom.heartbeat(False)
+pycom.rgbled(COLOUR_BLACK)
+
 # A basic package header, B: 1 byte for the deviceId, B: 1 byte for the pkg size, %ds: Formated string for string
 _LORA_PKG_FORMAT = "!BB%ds"
 # A basic ack package, B: 1 byte for the deviceId, B: 1 bytes for the pkg size, B: 1 byte for the Ok (200) or error messages
@@ -49,10 +58,11 @@ start_lora()
 start_OLED()
 
 while (True):
+    msg=""
     recv_pkg = lora_sock.recv(512)
     ##print(recv_pkg)
     if (len(recv_pkg) > 2):
-        print(recv_pkg[1])
+        ##print(recv_pkg[1])
         recv_pkg_len = recv_pkg[1]
         printLoraStats()
         device_id, pkg_len, msg = struct.unpack(_LORA_PKG_FORMAT % recv_pkg_len, recv_pkg)
@@ -60,7 +70,8 @@ while (True):
         x.PrintStrings('%s' % (msg))
         # If the uart = machine.UART(0, 115200) and os.dupterm(uart) are set in the boot.py this print should appear in the serial port
         print('Device: %d - Pkg:  %s' % (device_id, msg))
-
+        #print('msg type:', type(msg))
+        #print(msg[5])
         ack_pkg = struct.pack(_LORA_PKG_ACK_FORMAT, device_id, 1, 200)
         lora_sock.send(ack_pkg)
         print("ACK send")

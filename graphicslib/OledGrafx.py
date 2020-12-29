@@ -3,6 +3,7 @@
 
 from graphicslib import OledDisplay
 from graphicslib import FontArial11
+#RP1 returned to 11 - made no difference
 from graphicslib import FontDrawer
 
 # a simple hook to disable this module if there's no display connected
@@ -36,5 +37,3 @@ class OledGrafx :
         if(fourth is not None) :
             self.drawer.DrawString(fourth, 0, self.font11.height*3)
         self.oled.display()
-
-
