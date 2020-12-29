@@ -32,7 +32,7 @@ def start_OLED():
     x.PrintStrings("Waking up","...","Lopy-b says hello")
     time.sleep(1)
     x.oled.clear()
-    x.PrintStrings("freq:= ", str(lora.frequency()))
+    x.PrintStrings("freq:= ", "lora.frequency")
     time.sleep(1)
 #    x.oled.clear()
 
@@ -43,7 +43,7 @@ def printLoraStats():
     print(s_rssi, s_snr, s_freq)
     x.oled.clear()
     x.PrintStrings(s_rssi,s_snr,s_freq)
-    time.sleep_ms(1000)
+    time.sleep_ms(500)
 
 start_lora()
 start_OLED()
@@ -56,8 +56,7 @@ while (True):
         recv_pkg_len = recv_pkg[1]
         printLoraStats()
         device_id, pkg_len, msg = struct.unpack(_LORA_PKG_FORMAT % recv_pkg_len, recv_pkg)
-        x.oled.clear()
-        x.PrintStrings('%s' % (msg))
+
         # If the uart = machine.UART(0, 115200) and os.dupterm(uart) are set in the boot.py this print should appear in the serial port
         print('Device: %d - Pkg:  %s' % (device_id, msg))
 
